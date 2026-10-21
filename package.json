@@ -1,0 +1,13 @@
+{
+  "name": "brick-and-mortar-cafe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Brick and Mortar Cafe — About & Visit page with the 'A Little Coffee. A Brighter Day.' watercolor intro.",
+  "scripts": {
+    "serve": "python -m http.server 8080",
+    "render": "node render.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.0.0"
+  }
+}

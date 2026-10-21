@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>A Little Coffee. A Brighter Day. — render</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,750&family=Source+Sans+3:wght@400;500;600;700&family=Caveat:wght@400;700&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../css/story-overlay.css">
+<style>
+  html,body{margin:0;background:#141210;overflow:hidden}
+  /* full 1280x720 canvas for capture; hide all overlay chrome */
+  #bmc-story{position:static;inset:auto;background:#141210}
+  #bmc-story .bmc-stage{width:1280px;height:720px}
+  #bmc-canvas{width:1280px !important;height:720px !important;max-width:none !important;max-height:none !important;box-shadow:none !important}
+  #bmc-story .bmc-skip,#bmc-story .bmc-controls,#bmc-story .bmc-splash,#bmc-launch{display:none !important}
+  /* a tiny manual button, shown only when opened directly in a browser */
+  #dl{position:fixed;left:12px;bottom:12px;z-index:10;background:#a9462d;color:#fff;border:0;border-radius:999px;
+    padding:10px 16px;font-family:"Source Sans 3",sans-serif;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+  <script>window.BMC_NO_AUTOPLAY = true;</script>
+
+  <!-- overlay markup (same ids player.js expects; chrome hidden by CSS above) -->
+  <div id="bmc-story" role="img" aria-label="A Little Coffee. A Brighter Day.">
+    <div class="bmc-stage">
+      <canvas id="bmc-canvas" width="1280" height="720"></canvas>
+      <button class="bmc-skip" id="bmc-skip" type="button">Skip</button>
+      <div class="bmc-controls" id="bmc-controls" hidden>
+        <button id="bmc-play" type="button"><svg id="bmc-playicon" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></button>
+        <input class="bmc-scrub" id="bmc-scrub" type="range" min="0" max="1000" value="0">
+        <span class="bmc-time" id="bmc-time">0:00 / 0:20</span>
+        <button id="bmc-sound" type="button"><svg id="bmc-soundicon" viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/></svg></button>
+      </div>
+      <div class="bmc-splash" id="bmc-splash"><div class="ttl"></div><div class="bar"><i id="bmc-splashbar"></i></div><small id="bmc-splashmsg"></small></div>
+    </div>
+  </div>
+  <button id="bmc-launch" type="button"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>story</span></button>
+
+  <button id="dl" type="button">Download video</button>
+
+  <!-- animation modules -->
+  <script src="../js/story/harness.js"></script>
+  <script src="../js/story/sound.js"></script>
+  <script src="../js/story/watercolor-engine.js"></script>
+  <script src="../js/story/scenes.js"></script>
+  <script src="../js/story/player.js"></script>
+
+  <!-- recorder: one real-time pass, video (canvas) + audio (SOUND kit) locked to the audio clock -->
+  <script>
+  (function(){
+    function pickType(){
+      const cands=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,mp4a','video/mp4',
+                   'video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+      for(const t of cands){ try{ if(window.MediaRecorder && MediaRecorder.isTypeSupported(t)) return t; }catch(e){} }
+      return 'video/webm';
+    }
+    async function record(){
+      await document.fonts.ready.catch(()=>{});
+      await new Promise(res=>window.BMC_build(res));
+      const canvas=document.getElementById('bmc-canvas');
+      const DUR=window.DURATION||20;
+      const vstream=canvas.captureStream(30);
+      const AC=window.AudioContext||window.webkitAudioContext;
+      const actx=new AC();
+      if(actx.state==='suspended'){ try{ await actx.resume(); }catch(e){} }
+      const dest=actx.createMediaStreamDestination();
+      console.log('AudioContext state:', actx.state, 'sampleRate', actx.sampleRate);
+      // schedule the synced soundtrack straight into the recorder's audio destination
+      try{ window.scoreSound(window.SOUND.kit(actx,{start:0,delay:0.1,dest:dest,master:0.95})); }catch(e){ console.warn('audio',e); }
+      const mixed=new MediaStream([...vstream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
+      const type=pickType();
+      console.log('recording as', type);
+      const rec=new MediaRecorder(mixed,{mimeType:type,videoBitsPerSecond:12000000,audioBitsPerSecond:160000});
+      const chunks=[]; rec.ondataavailable=e=>{ if(e.data&&e.data.size) chunks.push(e.data); };
+      const stopped=new Promise(r=>{ rec.onstop=r; });
+      rec.start(100);
+      // drive frames by wall-clock (robust in headless); audio runs on the AudioContext
+      // clock — both advance in real time from the same start, so they stay in sync.
+      const t0=performance.now();
+      await new Promise(res=>{
+        const iv=setInterval(()=>{ const t=(performance.now()-t0)/1000; if(t>=DUR){ clearInterval(iv); window.seek(DUR); res(); } else { window.seek(t); } }, 1000/60);
+      });
+      await new Promise(r=>setTimeout(r,250));
+      rec.stop(); await stopped;
+      const blob=new Blob(chunks,{type});
+      window.__lastBlob=blob;
+      const ext=type.indexOf('mp4')>=0?'mp4':'webm';
+      return {type,ext,bytes:blob.size};
+    }
+    // Node entry: records, saves the blob on window, returns {type,ext,bytes}
+    window.__render=record;
+    // Manual entry: record then download in the browser
+    window.__downloadVideo=async function(){
+      const dl=document.getElementById('dl'); if(dl){dl.disabled=true;dl.textContent='Recording 20s…';}
+      const r=await record();
+      const a=document.createElement('a'); a.href=URL.createObjectURL(window.__lastBlob); a.download='animation.'+r.ext; a.click();
+      if(dl){dl.disabled=false;dl.textContent='Download video ('+r.ext+')';}
+    };
+    document.getElementById('dl').addEventListener('click',window.__downloadVideo);
+    window.__ready=true;
+  })();
+  </script>
+</body>
+</html>

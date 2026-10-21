@@ -1,0 +1,339 @@
+    :root {
+      color-scheme: light dark;
+      --paper: #f7f3ec;
+      --paper-2: #fffaf4;
+      --ink: #27201b;
+      --muted: #695f57;
+      --line: #d9d0c5;
+      --brick: #a9462d;
+      --brick-deep: #7a2c1d;
+      --gold: #e3a92b;
+      --sage: #5c6953;
+      --dark: #251a16;
+      --on-dark: #fff9f0;
+      --shadow: 0 20px 60px rgba(58, 34, 23, .16);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #171411;
+        --paper-2: #211c18;
+        --ink: #f5eee5;
+        --muted: #c7bbb0;
+        --line: #3f3730;
+        --brick: #e06b4d;
+        --brick-deep: #f08c70;
+        --gold: #edb84b;
+        --sage: #a6b79b;
+        --dark: #0e0c0a;
+        --on-dark: #fff9f0;
+        --shadow: 0 22px 62px rgba(0,0,0,.34);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Source Sans 3", sans-serif;
+      font-size: 18px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    button, a, input, select, textarea { font: inherit; }
+    a { color: inherit; }
+    img { display: block; width: 100%; }
+    .wrap { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+    /* ---------- Top rail + site header ---------- */
+    .info-rail { border-bottom: 1px solid var(--line); background: var(--paper-2); }
+    .info-rail .wrap {
+      min-height: 52px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .address { color: var(--muted); font-size: .92rem; font-weight: 600; }
+    .rail-call {
+      text-decoration: none; color: var(--brick); font-weight: 700;
+      display: inline-flex; align-items: center; gap: 9px; white-space: nowrap;
+    }
+    .rail-call svg { width: 18px; height: 18px; }
+    .site-head {
+      position: sticky; top: 0; z-index: 15;
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-head .wrap {
+      min-height: 74px;
+      display: flex; align-items: center; justify-content: space-between; gap: 22px;
+    }
+    .brand {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-weight: 750; font-size: 1.28rem; letter-spacing: -.02em;
+      text-decoration: none; line-height: 1.05;
+    }
+    .brand small {
+      display: block; font-family: "Source Sans 3", sans-serif;
+      font-size: .74rem; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--brick);
+    }
+    .site-nav { display: flex; align-items: center; gap: 6px; }
+    .site-nav a {
+      text-decoration: none; font-weight: 600; padding: 9px 14px; border-radius: 999px;
+    }
+    .site-nav a:hover { background: var(--paper-2); }
+    .site-nav a.current { background: var(--ink); color: var(--paper); }
+    .site-nav a.nav-call {
+      background: var(--brick); color: #fff; margin-left: 8px;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .site-nav a.nav-call svg { width: 16px; height: 16px; }
+
+    h1, h2, h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      margin: 0; line-height: .99; letter-spacing: -.04em;
+    }
+    .section-label {
+      display: inline-flex; color: var(--brick);
+      font-size: .88rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: 20px;
+    }
+    .btn {
+      min-height: 54px; padding: 0 22px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      border-radius: 999px; text-decoration: none;
+      border: 1px solid var(--line); font-weight: 700; cursor: pointer;
+      background: var(--paper-2); color: var(--ink);
+    }
+    .btn.primary { background: var(--brick); color: #fff; border-color: var(--brick); }
+    .btn svg { width: 19px; height: 19px; }
+
+    /* ---------- Page intro ---------- */
+    .intro { padding: 70px 0 64px; }
+    .intro h1 { font-size: clamp(3rem, 6.4vw, 6rem); max-width: 900px; }
+    .intro h1 em { color: var(--brick); font-style: normal; }
+    .intro .lede {
+      max-width: 640px; margin: 26px 0 0;
+      color: var(--muted); font-size: clamp(1.12rem, 1.8vw, 1.32rem);
+    }
+    .storefront {
+      margin-top: 52px; position: relative;
+    }
+    .storefront img {
+      aspect-ratio: 16 / 8.2; object-fit: cover;
+      border-radius: 30px; box-shadow: var(--shadow);
+    }
+    .storefront figcaption {
+      position: absolute; left: 22px; bottom: 22px;
+      background: var(--dark); color: var(--on-dark);
+      padding: 12px 18px; transform: rotate(-2deg);
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 650; line-height: 1.15;
+      max-width: 300px; box-shadow: var(--shadow);
+    }
+
+    /* ---------- About ---------- */
+    .about {
+      padding: 96px 0 30px;
+      display: grid; grid-template-columns: .92fr 1.08fr;
+      gap: clamp(44px, 7vw, 96px); align-items: start;
+    }
+    .about h2 { font-size: clamp(2.5rem, 4.6vw, 4.6rem); margin-bottom: 26px; }
+    .about-copy p { color: var(--muted); font-size: 1.13rem; margin: 0 0 22px; max-width: 600px; }
+    .about-copy p strong { color: var(--ink); }
+    .photo-stack { position: relative; }
+    .photo-stack::before {
+      content: ""; position: absolute; inset: 20px -20px -20px 20px;
+      background: var(--gold);
+      border-radius: 40% 40% 16% 18% / 24% 24% 13% 13%;
+      transform: rotate(2deg);
+    }
+    .photo-stack img.main {
+      position: relative; aspect-ratio: 4 / 4.6; object-fit: cover;
+      border-radius: 46% 46% 18% 18% / 25% 25% 12% 12%;
+      box-shadow: var(--shadow);
+    }
+    .owner-card {
+      margin-top: 34px; background: var(--paper-2);
+      border: 1px solid var(--line); border-radius: 22px;
+      padding: 28px 30px; max-width: 600px;
+    }
+    .owner-card h3 { font-size: 1.5rem; margin-bottom: 8px; }
+    .owner-card h3 span { color: var(--brick); }
+    .owner-card p { margin: 0; color: var(--muted); font-size: 1.05rem; }
+    .known-for {
+      list-style: none; margin: 30px 0 0; padding: 0;
+      border-top: 1px solid var(--line); max-width: 600px;
+    }
+    .known-for li {
+      display: flex; justify-content: space-between; gap: 20px;
+      padding: 15px 0; border-bottom: 1px solid var(--line); font-weight: 700;
+    }
+    .known-for small { color: var(--muted); font-weight: 500; text-align: right; }
+
+    /* ---------- Marquee ---------- */
+    .marquee {
+      overflow: hidden; background: var(--brick); color: #fff;
+      border-block: 1px solid var(--brick-deep);
+      transform: rotate(-1.2deg) scale(1.02);
+      margin: 92px 0 0;
+    }
+    .marquee-inner {
+      width: max-content; display: flex; gap: 36px; padding: 17px 0;
+      font-family: "Bricolage Grotesque", sans-serif; font-weight: 650; font-size: 1.03rem;
+    }
+    .marquee-inner span::after { content: "•"; margin-left: 36px; color: var(--gold); }
+
+    /* ---------- Visit ---------- */
+    .visit { background: var(--dark); color: var(--on-dark); padding: 96px 0 100px; }
+    .visit .section-label { color: var(--gold); }
+    .visit h2 { font-size: clamp(2.5rem, 4.6vw, 4.6rem); max-width: 720px; }
+    .visit-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 80px); margin-top: 54px; align-items: start;
+    }
+    .find-us p { color: rgba(255,249,240,.75); margin: 0 0 6px; }
+    .find-us .big-address {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(1.6rem, 2.6vw, 2.2rem); line-height: 1.12; letter-spacing: -.02em;
+      margin-bottom: 10px;
+    }
+    .find-us .area { color: var(--gold); font-weight: 700; margin-bottom: 28px; }
+    .visit .btn { background: var(--on-dark); color: #251a16; border-color: var(--on-dark); }
+    .visit .btn.ghost { background: transparent; color: var(--on-dark); border-color: rgba(255,249,240,.4); }
+    .visit-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .map-box {
+      margin-top: 34px; border-radius: 22px; overflow: hidden;
+      border: 1px solid rgba(255,249,240,.22); background: var(--paper-2);
+    }
+    #cafeMap { height: 340px; width: 100%; }
+    .map-fallback { padding: 26px; color: var(--ink); display: none; }
+    .map-fallback strong { display: block; font-size: 1.2rem; margin-bottom: 6px; }
+    .map-fallback p { color: var(--muted); margin: 0 0 16px; }
+    .map-fallback .btn { background: var(--brick); color: #fff; border-color: var(--brick); }
+    .hours-card {
+      border: 1px solid rgba(255,249,240,.22); border-radius: 22px;
+      padding: 30px 32px;
+    }
+    .hours-card h3 { font-size: 1.45rem; margin-bottom: 6px; }
+    .hours-card .today-line { color: var(--gold); font-weight: 700; margin: 0 0 18px; }
+    .hours { width: 100%; border-collapse: collapse; }
+    .hours th, .hours td {
+      text-align: left; padding: 11px 4px;
+      border-bottom: 1px solid rgba(255,249,240,.14);
+      font-size: 1.02rem;
+    }
+    .hours td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hours tr:last-child th, .hours tr:last-child td { border-bottom: 0; }
+    .hours tr.today th, .hours tr.today td { color: var(--gold); font-weight: 700; }
+    .today-tag {
+      display: inline-block; margin-left: 10px; padding: 2px 9px;
+      border: 1px solid var(--gold); border-radius: 999px;
+      font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .notes { margin-top: 58px; }
+    .notes h3 { font-size: 1.7rem; margin-bottom: 6px; }
+    .notes .fineprint { color: rgba(255,249,240,.66); margin: 0 0 28px; font-size: .98rem; }
+    .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .note {
+      border-top: 2px solid var(--gold); padding: 18px 4px 0;
+    }
+    .note strong { display: block; font-size: 1.12rem; margin-bottom: 6px; }
+    .note p { margin: 0; color: rgba(255,249,240,.75); font-size: 1rem; }
+
+    /* ---------- Contact ---------- */
+    .contact { padding: 100px 0 110px; }
+    .contact-grid {
+      display: grid; grid-template-columns: .9fr 1.1fr;
+      gap: clamp(44px, 7vw, 96px); align-items: start;
+    }
+    .contact h2 { font-size: clamp(2.5rem, 4.6vw, 4.6rem); margin-bottom: 22px; }
+    .contact-copy p { color: var(--muted); font-size: 1.13rem; max-width: 480px; margin: 0 0 28px; }
+    .call-card {
+      background: var(--dark); color: var(--on-dark);
+      border-radius: 22px; padding: 28px 30px; max-width: 480px;
+    }
+    .call-card p { margin: 0 0 4px; color: rgba(255,249,240,.7); font-size: .98rem; }
+    .call-card a {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(1.7rem, 3.4vw, 2.3rem); letter-spacing: -.02em;
+      text-decoration: none; color: var(--on-dark);
+    }
+    .call-card a:hover { color: var(--gold); }
+    .mini-photo { margin-top: 26px; max-width: 480px; }
+    .mini-photo img { aspect-ratio: 16 / 10; object-fit: cover; border-radius: 18px; box-shadow: var(--shadow); }
+    form.inquiry {
+      background: var(--paper-2); border: 1px solid var(--line);
+      border-radius: 22px; padding: 32px;
+    }
+    form.inquiry h3 { font-size: 1.45rem; margin-bottom: 20px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-weight: 700; font-size: .95rem; margin-bottom: 7px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 13px 15px;
+      border: 1px solid var(--line); border-radius: 12px;
+      background: var(--paper); color: var(--ink);
+    }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: 2px solid var(--brick); outline-offset: 1px; border-color: var(--brick);
+    }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    form.inquiry .btn { width: 100%; }
+    .note-output {
+      display: none; margin-top: 22px;
+      border: 1px dashed var(--brick); border-radius: 16px; padding: 20px 22px;
+    }
+    .note-output.show { display: block; }
+    .note-output h4 {
+      font-family: "Bricolage Grotesque", sans-serif; margin: 0 0 8px; font-size: 1.15rem;
+    }
+    .note-output pre {
+      white-space: pre-wrap; font-family: inherit; font-size: 1rem;
+      color: var(--muted); margin: 0 0 16px;
+    }
+    .note-output .row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .note-output .btn { width: auto; min-height: 48px; }
+
+    footer {
+      background: var(--dark); color: rgba(255,249,240,.66);
+      border-top: 1px solid rgba(255,255,255,.13);
+      padding: 30px 0 44px; font-size: .94rem;
+    }
+    footer .wrap { display: flex; justify-content: space-between; gap: 14px 30px; flex-wrap: wrap; }
+    footer strong { color: var(--on-dark); }
+
+    @media (max-width: 900px) {
+      .about, .visit-grid, .contact-grid { grid-template-columns: 1fr; }
+      .notes-grid { grid-template-columns: 1fr 1fr; }
+      .photo-stack { max-width: 480px; }
+      .storefront img { aspect-ratio: 16 / 10; }
+    }
+    @media (max-width: 640px) {
+      body { font-size: 17px; }
+      .wrap { width: min(100% - 28px, 680px); }
+      .address { font-size: .8rem; max-width: 210px; line-height: 1.25; }
+      .rail-call span { display: none; }
+      .site-head .wrap { min-height: 64px; flex-wrap: wrap; padding: 10px 0 12px; row-gap: 8px; }
+      .brand { font-size: 1.12rem; }
+      .site-nav { width: 100%; justify-content: space-between; }
+      .site-nav a { padding: 8px 10px; font-size: .96rem; }
+      .site-nav a.nav-call { margin-left: 0; }
+      .intro { padding: 46px 0 44px; }
+      .storefront { margin-top: 36px; }
+      .storefront img { aspect-ratio: 4 / 3; }
+      .storefront figcaption { left: 12px; bottom: 12px; max-width: 230px; font-size: .92rem; }
+      .about { padding: 70px 0 10px; }
+      .photo-stack::before { inset: 14px -10px -14px 14px; }
+      .hours-card { padding: 24px 20px; }
+      #cafeMap { height: 280px; }
+      .notes-grid { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      form.inquiry { padding: 24px 20px; }
+      .visit-actions .btn, .contact .actions .btn { width: 100%; }
+      footer .wrap { flex-direction: column; gap: 6px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  
