@@ -50,7 +50,7 @@ Brick and Mortar Cafe — About & Visit (animated).html  Self-contained single-f
 
 - **1280×720, ~20 s, 5 scenes** (bad morning → rainy discovery → warm welcome → the coffee → a brighter day), rendered live on a canvas in the watercolor style — cold-press paper, pigment pooling, wet-in-wet blooms, granulation, brush lettering.
 - **Autoplays once per session** (muted), then dissolves into the site. **Skip** (or `Esc`) ends it; **space** / `k` toggles play/pause. Controls: play/pause, scrub, time, **sound toggle** (starts muted). The bar auto‑hides during playback.
-- **Mobile:** scenes genuinely recompose to a 4:5 portrait — not a shrunk letterbox. Rebuilds on rotate/resize.
+- **Mobile:** the 16:9 short letterboxes to fit the screen.
 - **Reduced motion / repeat visits:** the site shows immediately; the **"Our story"** pill launches the short on demand. It never blocks the page.
 - **Render‑ready:** `window.seek(t)`, `window.DURATION` and `window.scoreSound` are exposed and deterministic (same `t` → same frame).
 
@@ -64,9 +64,8 @@ npm run render         # writes video/animation.mp4
 ```
 
 - Needs **Google Chrome** installed (the script auto-detects it; override with the `CHROME` env var).
-- No ffmpeg required — it records Chrome's own canvas + audio to H.264/AAC MP4.
+- No ffmpeg required — it renders every frame deterministically via **WebCodecs** (`window.seek(i/30)` → H.264/AAC), so the export is a true **30 FPS** with an exact timeline and smooth motion. The MP4 is faststart (streamable) and seekable.
 - **Alternative (no Node):** open `video/anim-render.html` in Chrome and click **Download video**.
-- The MP4 writes its index at the end (standard for in-browser recording). It plays and scrubs correctly once downloaded — which is how GitHub serves it. If you want a progressive/streaming‑optimized copy, run `ffmpeg -i video/animation.mp4 -c copy -movflags +faststart video/animation-web.mp4` (ffmpeg optional, not included).
 
 ## Reverting / removing the animation
 
