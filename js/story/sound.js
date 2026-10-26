@@ -43,6 +43,6 @@
     function music(name,t0,t1,p){if(VO)return;p=p||{};const g=p.gain==null?1:p.gain,bpm=p.bpm||64,bar=60/bpm*4;const chords=p.chords||[['F3','A3','C4','E4']];let i=0;for(let t=t0;t<t1-0.05;t+=bar,i++){const ch=chords[i%chords.length],len=Math.min(bar,t1-t);ch.forEach((n,k)=>{tone(t,{f:n,type:'triangle',dur:len+0.3,gain:0.03*g,a:0.3,hold:len-0.3,bus:'music',filter:'lowpass',f2:1400,pan:(k-1.5)*0.25,verb:0.25});});}}
     return{play,bed,music,tone,noise,withMinor,hz,vo:VO};
   };
-  SOUND.live=function(fn,fromT,opts){const ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();fn(SOUND.kit(ctx,Object.assign({},opts,{start:fromT||0,delay:0.04})));return()=>{try{ctx.close();}catch(e){}};};
+  SOUND.live=function(fn,fromT,opts){const ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();fn(SOUND.kit(ctx,Object.assign({},opts,{start:fromT||0,delay:0.04})));const stop=()=>{try{ctx.close();}catch(e){}};stop.ctx=ctx;return stop;};
   SOUND.renderOffline=async function(fn,duration,sampleRate,kitOpts){const sr=sampleRate||48000,len=Math.ceil(duration*sr);const ctx=new OfflineAudioContext(2,len,sr);fn(SOUND.kit(ctx,kitOpts||{}));const buf=await ctx.startRendering();const L=buf.getChannelData(0),R=buf.getChannelData(1),inter=new Float32Array(len*2);let peak=0;for(let i=0;i<len;i++){inter[2*i]=L[i];inter[2*i+1]=R[i];peak=Math.max(peak,Math.abs(L[i]),Math.abs(R[i]));}return{inter,peak,frames:len,sr,L,R};};
 })();
