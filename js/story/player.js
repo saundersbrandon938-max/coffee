@@ -29,7 +29,7 @@ const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: redu
 const W=1280,Hh=720;canvas.width=W;canvas.height=Hh;
 const ctx=canvas.getContext('2d',{willReadFrequently:false});
 let temp=WC.layer(W,Hh),tctx=temp.getContext('2d');
-let built=false,currentT=0,playing=false,rafA=0,lastTS=0,soundOn=false,stopSound=null;
+let built=false,currentT=0,playing=false,rafA=0,lastTS=0,soundOn=true,stopSound=null;
 
 function fmt(s){s=Math.max(0,s|0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 
@@ -83,8 +83,16 @@ window.seek=function(t){currentT=H.clamp(t,0,DURATION);renderFrame(currentT);syn
 window.scoreSound=scoreSound;
 function syncUI(){if(scrub)scrub.value=String(Math.round(currentT/DURATION*1000));if(timeEl)timeEl.textContent=fmt(currentT)+' / '+fmt(DURATION);if(playIcon)playIcon.innerHTML=playing?'<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>':'<path d="M7 4v16l13-8z"/>';}
 function loop(ts){if(!playing)return;if(!lastTS)lastTS=ts;const dt=(ts-lastTS)/1000;lastTS=ts;currentT+=dt;if(currentT>=DURATION){currentT=DURATION;renderFrame(currentT);syncUI();finish();return;}renderFrame(currentT);syncUI();rafA=requestAnimationFrame(loop);}
-function startSound(){if(stopSound){stopSound();stopSound=null;}if(soundOn)stopSound=window.SOUND.live(scoreSound,currentT,{voiceover:false});}
-function stopSnd(){if(stopSound){stopSound();stopSound=null;}}
+function startSound(){if(stopSound){stopSound();stopSound=null;}if(soundOn){stopSound=window.SOUND.live(scoreSound,currentT,{voiceover:false});checkBlocked();}else hideUnmute();}
+/* browsers block audio until the visitor interacts: detect that, prompt, and restart the score in sync on the first gesture */
+const btnUnmute=document.getElementById('bmc-unmute');let blockT=0;
+function audioBlocked(){return !!(stopSound&&stopSound.ctx&&stopSound.ctx.state!=='running');}
+function checkBlocked(){clearTimeout(blockT);blockT=setTimeout(()=>{if(playing&&soundOn&&audioBlocked())showUnmute();else hideUnmute();},250);}
+function showUnmute(){if(btnUnmute)btnUnmute.hidden=false;}
+function hideUnmute(){clearTimeout(blockT);if(btnUnmute)btnUnmute.hidden=true;}
+function unlockAudio(e){if(btnSound&&e&&e.target&&btnSound.contains(e.target))return;if(playing&&soundOn&&audioBlocked())startSound();}
+['pointerdown','touchend','keydown','click'].forEach(ev=>document.addEventListener(ev,unlockAudio,true));
+function stopSnd(){hideUnmute();if(stopSound){stopSound();stopSound=null;}}
 function play(){if(playing)return;if(currentT>=DURATION){currentT=0;}playing=true;lastTS=0;startSound();rafA=requestAnimationFrame(loop);syncUI();showUI();}
 function pause(){playing=false;cancelAnimationFrame(rafA);stopSnd();syncUI();stopIdle();}
 function finish(){playing=false;cancelAnimationFrame(rafA);stopSnd();syncUI();dissolveToSite();}
@@ -99,7 +107,9 @@ document.addEventListener('keydown',e=>{if(!overlay||overlay.style.display==='no
 btnPlay&&btnPlay.addEventListener('click',()=>{playing?pause():play();});
 btnSkip&&btnSkip.addEventListener('click',()=>{pause();finish();});
 scrub&&scrub.addEventListener('input',()=>{const t=Number(scrub.value)/1000*DURATION;pause();currentT=t;renderFrame(currentT);syncUI();});
-btnSound&&btnSound.addEventListener('click',()=>{soundOn=!soundOn;btnSound.setAttribute('aria-label',soundOn?'Turn sound off':'Turn sound on');if(soundIcon)soundIcon.innerHTML=soundOn?'<path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>':'<path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".25"/>';if(playing){stopSnd();startSound();}});
+function soundIconSync(){btnSound.setAttribute('aria-label',soundOn?'Turn sound off':'Turn sound on');if(soundIcon)soundIcon.innerHTML=soundOn?'<path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>':'<path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".25"/>';}
+if(btnSound)soundIconSync();
+btnSound&&btnSound.addEventListener('click',()=>{if(playing&&soundOn&&audioBlocked()){startSound();return;}soundOn=!soundOn;soundIconSync();if(playing){stopSnd();startSound();}});
 launcher&&launcher.addEventListener('click',launch);
 function launch(){openOverlay();if(!built){if(splash)splash.style.display='';if(controls)controls.hidden=true;if(splashbar)splashbar.style.width='0%';buildPlates(()=>{if(splash)splash.style.display='none';if(controls)controls.hidden=false;currentT=0;play();});}else{currentT=0;play();}}
 let rzT=0;window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(built)renderFrame(currentT);},200);});
